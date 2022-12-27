@@ -7,25 +7,25 @@ namespace Publisher
     {
         static void Main(string[] args)
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };//instance for conneting t server. "localhost" indicates that its working locally
-            using (var connection = factory.CreateConnection())
+            var factory = new ConnectionFactory() { HostName = "localhost" };//instance for conneting to server. "localhost" indicates that its working locally
+            using (var connection = factory.CreateConnection()) //manage the version of protocol, auth, ...
             using (var channel = connection.CreateModel())
             {
-                channel.QueueDeclare(queue: "dev-queue",
+                channel.QueueDeclare(queue: "my-queue",
                                      durable: false,
                                      exclusive: false,
                                      autoDelete: false,
                                      arguments: null);
 
-                var message = "Hi from Publisher";
+                var message = "Mess from Publisher";
                 var body = Encoding.UTF8.GetBytes(message);
 
                 channel.BasicPublish(exchange: "",
-                                     routingKey: "dev-queue",
+                                     routingKey: "my-queue",
                                      basicProperties: null,
                                      body: body);
 
-                System.Console.WriteLine("Mess is sent into Default Ex");
+                System.Console.WriteLine("Mess is sent into Default Exchange");
             }
         }
     }
