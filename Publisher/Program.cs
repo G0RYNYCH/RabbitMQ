@@ -1,5 +1,7 @@
 ﻿using RabbitMQ.Client;
+using System;
 using System.Text;
+using System.Threading;
 
 namespace Publisher
 {
@@ -7,26 +9,37 @@ namespace Publisher
     {
         static void Main(string[] args)
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };//instance for conneting to server. "localhost" indicates that its working locally
-            using (var connection = factory.CreateConnection()) //manage the version of protocol, auth, ...
-            using (var channel = connection.CreateModel())
+
+            var counter = 0;
+
+            do
             {
-                channel.QueueDeclare(queue: "my-queue",
-                                     durable: false,
-                                     exclusive: false,
-                                     autoDelete: false,
-                                     arguments: null);
+                var timeToSleep = new Random().Next(1000, 3000);
+                Thread.Sleep(timeToSleep);
 
-                var message = "Mess from Publisher";
-                var body = Encoding.UTF8.GetBytes(message);
+                var factory = new ConnectionFactory() { HostName = "localhost" };//instance for conneting to server. "localhost" indicates that its working locally
+                using (var connection = factory.CreateConnection()) //manage the version of protocol, auth, ...
+                using (var channel = connection.CreateModel())
+                {
+                    channel.QueueDeclare(queue: "my-queue",
+                                         durable: false,
+                                         exclusive: false,
+                                         autoDelete: false,
+                                         arguments: null);
 
-                channel.BasicPublish(exchange: "",
-                                     routingKey: "my-queue",
-                                     basicProperties: null,
-                                     body: body);
+                    var message = $"Mess from Publisher [#{counter}]";
+                    var body = Encoding.UTF8.GetBytes(message);
 
-                System.Console.WriteLine("Mess is sent into Default Exchange");
+                    channel.BasicPublish(exchange: "",
+                                         routingKey: "my-queue",
+                                         basicProperties: null,
+                                         body: body);
+
+                    System.Console.WriteLine($"Mess is sent into Default Exchange [#{counter++}]");
+                }
             }
+
+            while (true);
         }
     }
 }
