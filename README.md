@@ -1,2 +1,2 @@
-# RabbiMQ
-Testing RabbiMQ
+# RabbitMQ
+Testing RabbitMQ
